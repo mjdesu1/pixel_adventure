@@ -197,6 +197,18 @@ class Player extends SpriteAnimationGroupComponent
 
     velocity.x = horizontalMovement * moveSpeed;
     position.x += velocity.x * dt;
+    
+    // Boundary checks - prevent going outside game bounds
+    // Left boundary
+    if (position.x < 48) {
+      position.x = 48;
+      velocity.x = 0;
+    }
+    // Right boundary (map width is usually 640, but check based on level)
+    if (position.x > 592 - width) {
+      position.x = 592 - width;
+      velocity.x = 0;
+    }
   }
 
   void _playerJump(double dt) {
@@ -230,6 +242,13 @@ class Player extends SpriteAnimationGroupComponent
     velocity.y += _gravity;
     velocity.y = velocity.y.clamp(-_jumpForce, _terminalVelocity);
     position.y += velocity.y * dt;
+    
+    // Safety check: if player falls too far below the map, trigger death
+    if (position.y > 400) {
+      if (!gotHit) {
+        collidedwithEnemy();
+      }
+    }
   }
 
   void _checkVerticalCollisions() {

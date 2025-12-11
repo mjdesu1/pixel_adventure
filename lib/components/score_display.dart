@@ -15,17 +15,17 @@ class ScoreDisplay extends PositionComponent
   FutureOr<void> onLoad() {
     priority = 1000; // Always on top
 
-    // Score text
+    // Score text - moved down and smaller
     scoreText = TextComponent(
       text: 'Score: 0',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFFFFF),
-          fontSize: 24,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),
-      position: Vector2(10, 10),
+      position: Vector2(10, 25),
       anchor: Anchor.topLeft,
     );
     add(scoreText);

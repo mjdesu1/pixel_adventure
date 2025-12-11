@@ -5,6 +5,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/painting.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:pixel_adventure/components/jump_button.dart';
 import 'package:pixel_adventure/components/player.dart';
 import 'package:pixel_adventure/components/level.dart';
@@ -23,12 +24,12 @@ class PixelAdventure extends FlameGame
   @override
   Color backgroundColor() => const Color(0xFF211F30);
   late CameraComponent cam;
-  Player player = Player(character: 'Mask Dude');
+  Player player = Player(character: 'Ninja Frog');
   JoystickComponent? joystick;
   bool showControls = true; // Enable controls for mobile
   bool playSounds = true;
   double soundVolume = 1.0;
-  List<String> levelNames = ['Level-01', 'Level-02'];
+  List<String> levelNames = ['Level-01', 'Level-02', 'Level-03', 'Level-04'];
   int currentLevelIndex = 0;
   int score = 0; // Player's total score
   
@@ -48,6 +49,16 @@ class PixelAdventure extends FlameGame
   FutureOr<void> onLoad() async {
     // Load all images into cache
     await images.loadAllImages();
+
+    // Preload audio files
+    await FlameAudio.audioCache.loadAll([
+      'menumusic.mp3',
+      'game.mp3',
+      'disappear.wav',
+      'collect_fruit.wav',
+      'hit.wav',
+      'jump.wav',
+    ]);
 
     // Show main menu on start
     _showMainMenu();
@@ -120,21 +131,41 @@ class PixelAdventure extends FlameGame
     }
   }
 
-  void loadNextLevel() {
+  void loadNextLevel() async {
+    // Reset player state for next level
+    player.reachedCheckpoint = false;
+    player.gotHit = false;
+    
+    // Remove player from current parent first
+    if (player.isMounted) {
+      player.removeFromParent();
+    }
+    
+    // Remove joystick if it exists
+    if (joystick != null) {
+      joystick!.removeFromParent();
+      joystick = null;
+    }
+    
+    // Remove all game components before loading next level
     removeWhere((component) => component is Level);
+    removeWhere((component) => component is CameraComponent);
+
+    // Wait a bit for cleanup to complete
+    await Future.delayed(const Duration(milliseconds: 100));
 
     if (currentLevelIndex < levelNames.length - 1) {
       currentLevelIndex++;
       _loadLevel();
     } else {
-      // no more levels
+      // no more levels - restart from beginning
       currentLevelIndex = 0;
       _loadLevel();
     }
   }
 
   void _loadLevel() {
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(milliseconds: 500), () async {
       Level world = Level(
         player: player,
         levelName: levelNames[currentLevelIndex],
@@ -162,7 +193,9 @@ class PixelAdventure extends FlameGame
         addJoystickToViewport(cam);
       }
 
-      addAll([cam, world]);
+      // Add components to game
+      await add(cam);
+      await add(world);
     });
   }
 
@@ -172,6 +205,17 @@ class PixelAdventure extends FlameGame
     score = 0;
     player.gotHit = false;
     player.reachedCheckpoint = false;
+    
+    // Stop menu music and play game background music with smooth transition
+    if (playSounds) {
+      FlameAudio.bgm.stop();
+      Future.delayed(Duration(milliseconds: 50), () {
+        FlameAudio.bgm.play('game.mp3', volume: soundVolume);
+      });
+    } else {
+      FlameAudio.bgm.stop();
+    }
+    
     _loadLevel();
   }
 
@@ -186,6 +230,14 @@ class PixelAdventure extends FlameGame
     // Reset score
     score = 0;
     print('Score reset to 0');
+    
+    // Play game background music with smooth transition
+    if (playSounds) {
+      FlameAudio.bgm.stop();
+      Future.delayed(Duration(milliseconds: 50), () {
+        FlameAudio.bgm.play('game.mp3', volume: soundVolume);
+      });
+    }
     
     currentLevelIndex = 0;
     _loadLevel();
@@ -202,6 +254,9 @@ class PixelAdventure extends FlameGame
       joystick!.removeFromParent();
       joystick = null;
     }
+    
+    // Stop background music
+    FlameAudio.bgm.stop();
     
     // Reset game state
     currentLevelIndex = 0;

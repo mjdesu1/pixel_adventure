@@ -7,10 +7,12 @@ import 'package:pixel_adventure/components/advanced_settings.dart';
 
 class SettingsMenu extends PositionComponent
     with HasGameReference<PixelAdventure>, TapCallbacks {
-  SettingsMenu();
+  SettingsMenu() {
+    print('SettingsMenu constructor called');
+  }
 
   @override
-  int get priority => 2000;
+  int get priority => 100000;
 
   late RectangleComponent background;
   late RectangleComponent darkOverlay;
@@ -55,15 +57,30 @@ class SettingsMenu extends PositionComponent
 
   @override
   FutureOr<void> onLoad() {
+    print('SettingsMenu onLoad started');
     position = Vector2.zero();
     size = Vector2(640, 360);
+    
+    print('Position and size set');
+    
+    // Pause the game when settings opens (only if game is running)
+    try {
+      if (game.paused == false) {
+        game.pauseEngine();
+        print('Game paused');
+      }
+    } catch (e) {
+      print('Could not pause game: $e');
+    }
 
     // Dark overlay
+    print('Creating dark overlay');
     darkOverlay = RectangleComponent(
       size: Vector2(640, 360),
       paint: Paint()..color = const Color(0xDD000000),
     );
     add(darkOverlay);
+    print('Dark overlay added');
 
     // Background panel
     background = RectangleComponent(
@@ -386,6 +403,7 @@ class SettingsMenu extends PositionComponent
     // Create preview buttons
     _updatePreview();
 
+    print('SettingsMenu onLoad completed successfully');
     return super.onLoad();
   }
 
@@ -476,6 +494,13 @@ class SettingsMenu extends PositionComponent
     }
     // Close button
     else if (_isPointInButton(tapPosition, closeButton)) {
+      try {
+        if (game.paused == true) {
+          game.resumeEngine();
+        }
+      } catch (e) {
+        print('Could not resume game: $e');
+      }
       removeFromParent();
     }
 

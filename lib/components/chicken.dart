@@ -4,7 +4,9 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:pixel_adventure/components/collision_block.dart';
 import 'package:pixel_adventure/components/player.dart';
+import 'package:pixel_adventure/components/utils.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 enum State { idle, run, hit }
@@ -32,6 +34,7 @@ class Chicken extends SpriteAnimationGroupComponent
   double moveDirection = 1;
   double targetDirection = -1;
   bool gotStomped = false;
+  List<CollisionBlock> collisionBlocks = [];
 
   late final Player player;
   late final SpriteAnimation _idleAnimation;
@@ -51,6 +54,16 @@ class Chicken extends SpriteAnimationGroupComponent
     );
     _loadAllAnimations();
     _calculateRange();
+    
+    // Get collision blocks from parent (Level)
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (parent != null && parent is World) {
+        final level = parent as World;
+        // Find collision blocks in the level
+        collisionBlocks = level.children.whereType<CollisionBlock>().toList();
+      }
+    });
+    
     return super.onLoad();
   }
 
@@ -110,7 +123,21 @@ class Chicken extends SpriteAnimationGroupComponent
 
     moveDirection = lerpDouble(moveDirection, targetDirection, 0.1) ?? 1;
 
+    // Store old position before moving
+    final oldX = position.x;
     position.x += velocity.x * dt;
+    
+    // Check collision with blocks after moving
+    _checkHorizontalCollisions();
+    
+    // Stay within movement range
+    if (position.x < rangeNeg) {
+      position.x = rangeNeg;
+      velocity.x = 0;
+    } else if (position.x > rangePos) {
+      position.x = rangePos;
+      velocity.x = 0;
+    }
   }
 
   bool playerInRange() {
@@ -131,6 +158,39 @@ class Chicken extends SpriteAnimationGroupComponent
     }
   }
 
+  void _checkHorizontalCollisions() {
+    for (final block in collisionBlocks) {
+      if (!block.isPlatform) {
+        // Create a simple hitbox for the chicken
+        final chickenLeft = position.x + 4;
+        final chickenRight = position.x + 4 + 24;
+        final chickenTop = position.y + 6;
+        final chickenBottom = position.y + 6 + 26;
+        
+        final blockLeft = block.x;
+        final blockRight = block.x + block.width;
+        final blockTop = block.y;
+        final blockBottom = block.y + block.height;
+        
+        // Check if chicken overlaps with block
+        if (chickenRight > blockLeft &&
+            chickenLeft < blockRight &&
+            chickenBottom > blockTop &&
+            chickenTop < blockBottom) {
+          // Collision detected - stop movement
+          if (velocity.x > 0) {
+            velocity.x = 0;
+            position.x = block.x - 28; // 4 (offset) + 24 (hitbox width)
+          } else if (velocity.x < 0) {
+            velocity.x = 0;
+            position.x = block.x + block.width - 4;
+          }
+          break;
+        }
+      }
+    }
+  }
+
   void collidedWithPlayer() async {
     if (player.velocity.y > 0 && player.y + player.height > position.y) {
       if (game.playSounds) {
@@ -139,6 +199,10 @@ class Chicken extends SpriteAnimationGroupComponent
       gotStomped = true;
       current = State.hit;
       player.velocity.y = -_bounceHeight;
+      
+      // Add 100 points for killing enemy
+      game.addScore(100);
+      
       await animationTicker?.completed;
       removeFromParent();
     } else {

@@ -144,6 +144,8 @@ class Duck extends SpriteAnimationGroupComponent
       gotStomped = true;
       current = State.hit;
       player.velocity.y = -_bounceHeight;
+      // Add 100 points for killing enemy
+      game.addScore(100);
       await animationTicker?.completed;
       removeFromParent();
     } else {

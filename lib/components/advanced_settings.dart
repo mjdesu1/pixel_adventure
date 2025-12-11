@@ -9,7 +9,7 @@ class AdvancedSettings extends PositionComponent
   AdvancedSettings();
 
   @override
-  int get priority => 2000;
+  int get priority => 10000;
 
   late RectangleComponent darkOverlay;
   late RectangleComponent panel;

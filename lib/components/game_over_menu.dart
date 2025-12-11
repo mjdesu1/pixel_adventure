@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/painting.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 
 class GameOverMenu extends PositionComponent
@@ -12,7 +13,7 @@ class GameOverMenu extends PositionComponent
   }
   
   @override
-  int get priority => 1000; // Always render on top
+  int get priority => 10000; // Always render on top
 
   late RectangleComponent darkOverlay;
   late TextComponent gameOverText;
@@ -26,6 +27,12 @@ class GameOverMenu extends PositionComponent
     // Position at camera/screen coordinates (0,0)
     position = Vector2.zero();
     size = Vector2(640, 360);
+    
+    // Stop background music and play game over music once
+    FlameAudio.bgm.stop();
+    if (game.playSounds) {
+      FlameAudio.play('Over.mp3', volume: game.soundVolume);
+    }
 
     // Dark semi-transparent overlay
     darkOverlay = RectangleComponent(
@@ -37,7 +44,7 @@ class GameOverMenu extends PositionComponent
 
     // Game Over Text
     gameOverText = TextComponent(
-      text: 'GAME OVER',
+      text: 'Boom Pildi',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFF0000),
@@ -61,7 +68,7 @@ class GameOverMenu extends PositionComponent
 
     // Yes Text
     yesText = TextComponent(
-      text: 'Play Again',
+      text: 'dula utro',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFFFFF),
@@ -84,7 +91,7 @@ class GameOverMenu extends PositionComponent
 
     // No Text
     noText = TextComponent(
-      text: 'Main Menu',
+      text: 'mag hawa',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFFFFF),
@@ -97,6 +104,13 @@ class GameOverMenu extends PositionComponent
     add(noText);
 
     return super.onLoad();
+  }
+
+  @override
+  void onRemove() {
+    // Stop all audio when game over menu is removed
+    FlameAudio.bgm.stop();
+    super.onRemove();
   }
 
   @override

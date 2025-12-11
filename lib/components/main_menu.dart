@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/painting.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:pixel_adventure/pixel_adventure.dart';
 import 'package:pixel_adventure/utils/high_score_manager.dart';
 import 'package:pixel_adventure/components/settings_menu.dart';
@@ -33,185 +34,211 @@ class MainMenu extends PositionComponent
   late SpriteComponent nextButton;
   
   final List<String> characters = [
-    'Mask Dude',
     'Ninja Frog',
     'Pink Man',
     'Virtual Guy',
   ];
   int selectedCharacterIndex = 0;
+  bool musicStarted = false;
+
 
   @override
-  FutureOr<void> onLoad() {
+  FutureOr<void> onLoad() async {
     position = Vector2.zero();
     size = Vector2(640, 360);
 
-    // Background
+    // Background image - stretch to fill entire screen
+    final bgImage = game.images.fromCache('Background/BG.jpg');
+    final bgSprite = SpriteComponent(
+      sprite: Sprite(bgImage),
+      size: Vector2(640, 360),
+      position: Vector2.zero(),
+    );
+    add(bgSprite);
+
+    // Dark overlay for better text visibility
     background = RectangleComponent(
       size: Vector2(640, 360),
       position: Vector2.zero(),
-      paint: Paint()..color = const Color(0xFF211F30),
+      paint: Paint()..color = const Color(0x55000000),
     );
     add(background);
 
-    // Title
+    // Title - Top left (moved down)
     titleText = TextComponent(
-      text: 'PIXEL ADVENTURE',
+      text: 'PEXIL MANGITA\nPRUTAS',
       textRenderer: TextPaint(
         style: TextStyle(
-          color: Color(0xFFFFD700),
-          fontSize: 42,
+          color: Color(0xFFFFFFFF),
+          fontSize: 28,
           fontWeight: FontWeight.bold,
+          letterSpacing: 2,
         ),
       ),
-      position: Vector2(320, 50),
-      anchor: Anchor.center,
+      position: Vector2(60, 65),
+      anchor: Anchor.centerLeft,
     );
     add(titleText);
 
+    // Menu buttons - Left side vertical layout
+    double startY = 120;
+    double spacing = 50;
+
     // Play Button
+    playText = TextComponent(
+      text: 'DULA',
+      textRenderer: TextPaint(
+        style: TextStyle(
+          color: Color(0xFFFFD700),
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1,
+        ),
+      ),
+      position: Vector2(80, startY),
+      anchor: Anchor.centerLeft,
+    );
+    add(playText);
+
     playButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Play.png')),
-      size: Vector2(64, 64),
-      position: Vector2(320, 130),
+      size: Vector2(32, 32),
+      position: Vector2(40, startY),
       anchor: Anchor.center,
     );
     add(playButton);
 
-    playText = TextComponent(
-      text: 'Play Now',
+    // How to Play
+    howToPlayText = TextComponent(
+      text: 'UNSAON PAGDULA',
       textRenderer: TextPaint(
         style: TextStyle(
-          color: Color(0xFFFFFFFF),
+          color: Color(0xFFCCCCCC),
           fontSize: 18,
+          letterSpacing: 1,
         ),
       ),
-      position: Vector2(320, 170),
-      anchor: Anchor.center,
+      position: Vector2(80, startY + spacing),
+      anchor: Anchor.centerLeft,
     );
-    add(playText);
+    add(howToPlayText);
 
-    // How to Play Button
     howToPlayButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Achievements.png')),
-      size: Vector2(42, 42),
-      position: Vector2(200, 220),
+      size: Vector2(28, 28),
+      position: Vector2(40, startY + spacing),
       anchor: Anchor.center,
     );
     add(howToPlayButton);
 
-    howToPlayText = TextComponent(
-      text: 'How to Play',
+    // High Scores
+    highScoresText = TextComponent(
+      text: 'TAAS OG SCORE',
       textRenderer: TextPaint(
         style: TextStyle(
-          color: Color(0xFFFFFFFF),
-          fontSize: 12,
+          color: Color(0xFFCCCCCC),
+          fontSize: 18,
+          letterSpacing: 1,
         ),
       ),
-      position: Vector2(200, 250),
-      anchor: Anchor.center,
+      position: Vector2(80, startY + spacing * 2),
+      anchor: Anchor.centerLeft,
     );
-    add(howToPlayText);
+    add(highScoresText);
 
-    // High Scores Button
     highScoresButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Achievements.png')),
-      size: Vector2(42, 42),
-      position: Vector2(320, 220),
+      size: Vector2(28, 28),
+      position: Vector2(40, startY + spacing * 2),
       anchor: Anchor.center,
     );
     add(highScoresButton);
 
-    highScoresText = TextComponent(
-      text: 'High Scores',
+    // About
+    aboutText = TextComponent(
+      text: 'MAHITUNGOD',
       textRenderer: TextPaint(
         style: TextStyle(
-          color: Color(0xFFFFD700),
-          fontSize: 12,
+          color: Color(0xFFCCCCCC),
+          fontSize: 18,
+          letterSpacing: 1,
         ),
       ),
-      position: Vector2(320, 250),
-      anchor: Anchor.center,
+      position: Vector2(80, startY + spacing * 3),
+      anchor: Anchor.centerLeft,
     );
-    add(highScoresText);
+    add(aboutText);
 
-    // About Button
     aboutButton = SpriteComponent(
-      sprite: Sprite(game.images.fromCache('Menu/Buttons/Settings.png')),
-      size: Vector2(42, 42),
-      position: Vector2(440, 220),
+      sprite: Sprite(game.images.fromCache('Menu/Buttons/Levels.png')),
+      size: Vector2(28, 28),
+      position: Vector2(40, startY + spacing * 3),
       anchor: Anchor.center,
     );
     add(aboutButton);
 
-    aboutText = TextComponent(
-      text: 'About',
-      textRenderer: TextPaint(
-        style: TextStyle(
-          color: Color(0xFFFFFFFF),
-          fontSize: 12,
-        ),
-      ),
-      position: Vector2(440, 250),
-      anchor: Anchor.center,
-    );
-    add(aboutText);
-
-    // Settings Button
+    // Settings - Top right corner (moved down)
     settingsButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Settings.png')),
-      size: Vector2(42, 42),
-      position: Vector2(520, 220),
+      size: Vector2(36, 36),
+      position: Vector2(590, 50),
       anchor: Anchor.center,
     );
     add(settingsButton);
 
     settingsText = TextComponent(
-      text: 'Settings',
+      text: '',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFFFFF),
-          fontSize: 12,
+          fontSize: 14,
         ),
       ),
-      position: Vector2(520, 250),
+      position: Vector2(590, 50),
       anchor: Anchor.center,
     );
     add(settingsText);
 
-    // Character Selection Label
+    // Character Selection - Right side center
     characterLabel = TextComponent(
-      text: 'Select Character:',
+      text: 'Pilia ang Character:',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFFFFF),
           fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
-      position: Vector2(320, 285),
+      position: Vector2(450, 150),
       anchor: Anchor.center,
     );
     add(characterLabel);
 
-    // Previous Character Button
     prevButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Previous.png')),
       size: Vector2(32, 32),
-      position: Vector2(230, 325),
+      position: Vector2(360, 200),
       anchor: Anchor.center,
     );
     add(prevButton);
 
-    // Character Preview (idle animation)
     _loadCharacterPreview();
 
-    // Next Character Button
     nextButton = SpriteComponent(
       sprite: Sprite(game.images.fromCache('Menu/Buttons/Next.png')),
       size: Vector2(32, 32),
-      position: Vector2(410, 325),
+      position: Vector2(540, 200),
       anchor: Anchor.center,
     );
     add(nextButton);
+
+    // Start menu music immediately
+    if (game.playSounds && !musicStarted) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        FlameAudio.bgm.play('menumusic.mp3', volume: game.soundVolume);
+        musicStarted = true;
+      });
+    }
 
     return super.onLoad();
   }
@@ -234,11 +261,12 @@ class MainMenu extends PositionComponent
         ),
       ),
       size: Vector2(64, 64),
-      position: Vector2(320, 325),
+      position: Vector2(450, 200),
       anchor: Anchor.center,
     );
     add(characterPreview!);
   }
+
 
   @override
   void onTapDown(TapDownEvent event) {
@@ -247,28 +275,29 @@ class MainMenu extends PositionComponent
     print('Main Menu tap at: $tapPosition');
     print('Play button at: ${playButton.position}, size: ${playButton.size}');
 
-    // Play Button
-    if (_isPointInButton(tapPosition, playButton)) {
+    // Play Button (check both icon and text area)
+    if (_isPointInButton(tapPosition, playButton) || _isPointInText(tapPosition, playText)) {
       print('Play button clicked!');
       // Set character
       game.player.character = characters[selectedCharacterIndex];
-      removeFromParent();
       game.startGame();
+      removeFromParent();
     }
     // How to Play Button
-    else if (_isPointInButton(tapPosition, howToPlayButton)) {
+    else if (_isPointInButton(tapPosition, howToPlayButton) || _isPointInText(tapPosition, howToPlayText)) {
       _showHowToPlay();
     }
     // High Scores Button
-    else if (_isPointInButton(tapPosition, highScoresButton)) {
+    else if (_isPointInButton(tapPosition, highScoresButton) || _isPointInText(tapPosition, highScoresText)) {
       _showHighScores();
     }
     // About Button
-    else if (_isPointInButton(tapPosition, aboutButton)) {
+    else if (_isPointInButton(tapPosition, aboutButton) || _isPointInText(tapPosition, aboutText)) {
       _showAbout();
     }
     // Settings Button
     else if (_isPointInButton(tapPosition, settingsButton)) {
+      print('Settings button clicked!');
       _showSettings();
     }
     // Previous Character Button
@@ -298,6 +327,22 @@ class MainMenu extends PositionComponent
         point.y <= bottom;
   }
 
+  bool _isPointInText(Vector2 point, TextComponent text) {
+    // Approximate text bounds (width based on text length, height based on font size)
+    final textWidth = text.text.length * 12.0; // Approximate character width
+    final textHeight = 30.0; // Approximate height
+    
+    final left = text.position.x;
+    final right = text.position.x + textWidth;
+    final top = text.position.y - textHeight / 2;
+    final bottom = text.position.y + textHeight / 2;
+    
+    return point.x >= left &&
+        point.x <= right &&
+        point.y >= top &&
+        point.y <= bottom;
+  }
+
   void _showHowToPlay() {
     // Create How to Play overlay
     final howToPlay = HowToPlayOverlay();
@@ -317,9 +362,15 @@ class MainMenu extends PositionComponent
   }
 
   void _showSettings() {
+    print('Creating settings menu...');
     // Create Settings overlay
-    final settings = SettingsMenu();
-    game.add(settings);
+    try {
+      final settings = SettingsMenu();
+      game.add(settings);
+      print('Settings menu added to game');
+    } catch (e) {
+      print('Error creating settings: $e');
+    }
   }
 
 }
@@ -327,7 +378,7 @@ class MainMenu extends PositionComponent
 // How to Play Overlay
 class HowToPlayOverlay extends PositionComponent with TapCallbacks {
   @override
-  int get priority => 2000;
+  int get priority => 10000;
 
   @override
   FutureOr<void> onLoad() {
@@ -343,7 +394,7 @@ class HowToPlayOverlay extends PositionComponent with TapCallbacks {
 
     // Title
     final title = TextComponent(
-      text: 'HOW TO PLAY',
+      text: 'UNSAON PAGDULA',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFD700),
@@ -356,30 +407,37 @@ class HowToPlayOverlay extends PositionComponent with TapCallbacks {
     );
     add(title);
 
-    // Instructions
+    // Instructions in Bisaya with HUD info
     final instructions = [
-      'Arrow Keys / WASD - Move',
-      'Space - Jump',
-      'Collect Fruits - Earn Points',
-      'Avoid Enemies & Traps',
-      'Reach Checkpoint to Win',
+      'Keyboard:',
+      'Arrow Keys / WASD - Paglihok',
+      'Space - Paglukso',
+      '',
+      'Mobile (HUD):',
+      'Joystick - Paglihok',
+      'Jump Button - Paglukso',
+      '',
+      'Tiguma ang mga Prutas',
+      'Patya ang Kaaway (100 points)',
+      'Abti ang Checkpoint',
     ];
 
-    double yPos = 100;
+    double yPos = 90;
     for (final instruction in instructions) {
       final text = TextComponent(
         text: instruction,
         textRenderer: TextPaint(
           style: TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: 18,
+            color: instruction.endsWith(':') ? Color(0xFFFFD700) : Color(0xFFFFFFFF),
+            fontSize: instruction.endsWith(':') ? 16 : 14,
+            fontWeight: instruction.endsWith(':') ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         position: Vector2(320, yPos),
         anchor: Anchor.center,
       );
       add(text);
-      yPos += 35;
+      yPos += instruction.isEmpty ? 10 : 24;
     }
 
     // Close text
@@ -409,7 +467,7 @@ class HowToPlayOverlay extends PositionComponent with TapCallbacks {
 // About Overlay
 class AboutOverlay extends PositionComponent with TapCallbacks {
   @override
-  int get priority => 2000;
+  int get priority => 10000;
 
   @override
   FutureOr<void> onLoad() {
@@ -425,7 +483,7 @@ class AboutOverlay extends PositionComponent with TapCallbacks {
 
     // Title
     final title = TextComponent(
-      text: 'ABOUT',
+      text: 'MAHITUNGOD',
       textRenderer: TextPaint(
         style: TextStyle(
           color: Color(0xFFFFD700),
@@ -438,32 +496,40 @@ class AboutOverlay extends PositionComponent with TapCallbacks {
     );
     add(title);
 
-    // About text
+    // About text - Game info in Bisaya
     final aboutLines = [
-      'Pixel Adventure',
+      'Mahitungod sa Dula:',
       '',
-      'A fun platformer game',
-      'Collect fruits, avoid enemies,',
-      'and reach the checkpoint!',
+      'Pexil Mangita Prutas',
+      'usa ka adventure platformer game',
       '',
-      'Made with Flutter & Flame',
+      'Tiguma ang tanan nga prutas',
+      'aron makita ang checkpoint.',
+      'Patya ang mga kaaway',
+      'ug likayi ang mga bitik!',
+      '',
+      'Gihimo gamit ang Flutter & Flame',
     ];
 
-    double yPos = 130;
+    double yPos = 100;
     for (final line in aboutLines) {
       final text = TextComponent(
         text: line,
         textRenderer: TextPaint(
           style: TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: 18,
+            color: line == 'Mahitungod sa Dula:' || line == 'Pexil Mangita Prutas' 
+                ? Color(0xFFFFD700) : Color(0xFFFFFFFF),
+            fontSize: line == 'Mahitungod sa Dula:' ? 20 : 
+                     line == 'Pexil Mangita Prutas' ? 18 : 15,
+            fontWeight: line == 'Mahitungod sa Dula:' || line == 'Pexil Mangita Prutas'
+                ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         position: Vector2(320, yPos),
         anchor: Anchor.center,
       );
       add(text);
-      yPos += 30;
+      yPos += line.isEmpty ? 15 : 26;
     }
 
     // Close text
@@ -493,7 +559,7 @@ class AboutOverlay extends PositionComponent with TapCallbacks {
 // High Scores Overlay
 class HighScoresOverlay extends PositionComponent with TapCallbacks {
   @override
-  int get priority => 2000;
+  int get priority => 10000;
 
   @override
   FutureOr<void> onLoad() async {

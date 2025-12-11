@@ -10,7 +10,7 @@ class Fruit extends SpriteAnimationComponent
     with HasGameReference<PixelAdventure>, CollisionCallbacks {
   final String fruit;
   Fruit({
-    this.fruit = 'Apple',
+    required this.fruit,
     position,
     size,
   }) : super(

@@ -11,8 +11,8 @@ class PauseButton extends SpriteComponent
   @override
   FutureOr<void> onLoad() {
     sprite = Sprite(game.images.fromCache('Menu/Buttons/Settings.png'));
-    size = Vector2.all(40);
-    position = Vector2(600, 10);
+    size = Vector2.all(32);
+    position = Vector2(630, 25);
     anchor = Anchor.topRight;
     priority = 1000;
     return super.onLoad();

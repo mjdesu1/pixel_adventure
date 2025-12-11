@@ -9,7 +9,7 @@ class PauseMenu extends PositionComponent
   PauseMenu();
 
   @override
-  int get priority => 1500;
+  int get priority => 10000;
 
   late RectangleComponent darkOverlay;
   late TextComponent pausedText;

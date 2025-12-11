@@ -36,14 +36,14 @@
   <object id="21" name="Bananas" type="Fruit" x="80" y="80" width="32" height="32"/>
   <object id="22" name="Orange" type="Fruit" x="80" y="128" width="32" height="32"/>
   <object id="23" name="Apple" type="Fruit" x="80" y="176" width="32" height="32"/>
-  <object id="24" name="Cherries" type="Fruit" x="192" y="128" width="32" height="32"/>
-  <object id="25" name="Cherries" type="Fruit" x="224" y="128" width="32" height="32"/>
-  <object id="26" name="Cherries" type="Fruit" x="208" y="96" width="32" height="32"/>
-  <object id="27" name="Cherries" type="Fruit" x="336" y="160" width="32" height="32"/>
-  <object id="28" name="Cherries" type="Fruit" x="368" y="160" width="32" height="32"/>
-  <object id="29" name="Cherries" type="Fruit" x="352" y="128" width="32" height="32"/>
-  <object id="30" name="Kiwi" type="Fruit" x="480" y="128" width="32" height="32"/>
-  <object id="31" name="Kiwi" type="Fruit" x="480" y="176" width="32" height="32"/>
+  <object id="24" name="Pineapple" type="Fruit" x="192" y="128" width="32" height="32"/>
+  <object id="25" name="Pineapple" type="Fruit" x="224" y="128" width="32" height="32"/>
+  <object id="26" name="Pineapple" type="Fruit" x="208" y="96" width="32" height="32"/>
+  <object id="27" name="Pineapple" type="Fruit" x="336" y="160" width="32" height="32"/>
+  <object id="28" name="Pineapple" type="Fruit" x="368" y="160" width="32" height="32"/>
+  <object id="29" name="Pineapple" type="Fruit" x="352" y="128" width="32" height="32"/>
+  <object id="30" name="Melon" type="Fruit" x="480" y="128" width="32" height="32"/>
+  <object id="31" name="Melon" type="Fruit" x="480" y="176" width="32" height="32"/>
   <object id="34" type="Saw" x="288" y="128" width="32" height="32">
    <properties>
     <property name="isVertical" type="bool" value="true"/>

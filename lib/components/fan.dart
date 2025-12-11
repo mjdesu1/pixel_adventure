@@ -93,9 +93,9 @@ class Fan extends SpriteAnimationComponent
   @override
   void onCollisionStart(
       Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is Player && isVertical) {
-      // Push player upward with wind force
-      other.velocity.y = -200; // Strong upward wind
+    if (other is Player) {
+      // Fan blades are deadly - trigger game over
+      other.collidedwithEnemy();
     }
     super.onCollisionStart(intersectionPoints, other);
   }
