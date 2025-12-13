@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level-03.tmx",
+    "activeFile": "Level-05.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -11,13 +11,13 @@
     "fileStates": {
         "Level-01.tmx": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 354.5,
+                "x": 320,
                 "y": 183.5
             }
         },
@@ -28,20 +28,44 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 320.3333333333333,
-                "y": 183.66666666666663
+                "x": 320,
+                "y": 183.66666666666669
             }
         },
         "Level-03.tmx": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 154,
-                "y": 174.5
+                "x": 320,
+                "y": 183.5
+            }
+        },
+        "Level-04.tmx": {
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
+            "scale": 3,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 320,
+                "y": 184.16666666666663
+            }
+        },
+        "Level-05.tmx": {
+            "expandedObjectLayers": [
+                3,
+                2
+            ],
+            "scale": 8,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 339,
+                "y": 257.9375
             }
         },
         "Pixel Adventure.tsx": {
@@ -59,14 +83,18 @@
         "Pixel Adventure.tsx",
         "Level-01.tmx",
         "Level-02.tmx",
-        "Level-03.tmx"
+        "Level-03.tmx",
+        "Level-04.tmx",
+        "Level-05.tmx"
     ],
     "project": "Pixel Adventure.tiled-project",
     "recentFiles": [
         "Pixel Adventure.tsx",
         "Level-01.tmx",
         "Level-02.tmx",
-        "Level-03.tmx"
+        "Level-03.tmx",
+        "Level-04.tmx",
+        "Level-05.tmx"
     ],
     "resizeMap.removeObjects": true,
     "tileset.lastUsedFormat": "tsx",

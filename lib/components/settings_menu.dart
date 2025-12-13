@@ -62,16 +62,6 @@ class SettingsMenu extends PositionComponent
     size = Vector2(640, 360);
     
     print('Position and size set');
-    
-    // Pause the game when settings opens (only if game is running)
-    try {
-      if (game.paused == false) {
-        game.pauseEngine();
-        print('Game paused');
-      }
-    } catch (e) {
-      print('Could not pause game: $e');
-    }
 
     // Dark overlay
     print('Creating dark overlay');
@@ -494,13 +484,6 @@ class SettingsMenu extends PositionComponent
     }
     // Close button
     else if (_isPointInButton(tapPosition, closeButton)) {
-      try {
-        if (game.paused == true) {
-          game.resumeEngine();
-        }
-      } catch (e) {
-        print('Could not resume game: $e');
-      }
       removeFromParent();
     }
 
